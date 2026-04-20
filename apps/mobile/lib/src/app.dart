@@ -10,7 +10,7 @@ class FicctFinalApp extends StatelessWidget {
     return MaterialApp(
       title: 'FICCT Final App',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
+      theme: AppTheme.dark(),
       home: const HomePage(),
     );
   }

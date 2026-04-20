@@ -1,7 +1,7 @@
 class AppConfig {
   const AppConfig._();
 
-  static const String appName = 'FICCT Final App';
+  static const String appName = 'WiFiScope';
   static const String environment = String.fromEnvironment(
     'APP_ENV',
     defaultValue: 'development',
