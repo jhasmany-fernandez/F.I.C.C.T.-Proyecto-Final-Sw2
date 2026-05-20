@@ -12,6 +12,7 @@ const STORAGE_REFRESH = "refresh_token";
 export const apiClient = axios.create({
   baseURL: "/api",
   headers: { "Content-Type": "application/json" },
+  timeout: 10_000,
 });
 
 // ── Interceptor de request: adjunta Bearer token ──────────────────────────

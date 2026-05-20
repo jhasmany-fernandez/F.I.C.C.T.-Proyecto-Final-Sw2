@@ -7,11 +7,12 @@ import AdminLayout from "@/features/admin/pages/AdminLayout";
 import GestionUsuarios from "@/features/admin/pages/GestionUsuarios";
 import GestionClientes from "@/features/admin/pages/GestionClientes";
 import ListadoProyectosOrg from "@/features/admin/pages/ListadoProyectosOrg";
+import CoverageAnalysisPage from "@/features/admin/pages/CoverageAnalysisPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: false,
       staleTime: 30_000,
     },
   },
@@ -38,6 +39,10 @@ function AppRoutes() {
         <Route path="usuarios" element={<GestionUsuarios />} />
         <Route path="clientes" element={<GestionClientes />} />
         <Route path="proyectos" element={<ListadoProyectosOrg />} />
+        <Route
+          path="proyectos/:proyectoId/diagnostico"
+          element={<CoverageAnalysisPage />}
+        />
       </Route>
 
       {/* Portal cliente — pendiente Sprint 6 (RP9) */}

@@ -7,7 +7,55 @@
 *.env
 
 # ─────────────────────────────────────────
-# Flutter / Dart  (mobile/)
+# Python / FastAPI
+# ─────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+backend/.venv/
+backend/venv/
+backend/dist/
+backend/*.egg-info/
+backend/test.db
+backend/coverage*.json
+backend/coverage_output.txt
+backend/test_output.txt
+backend/test_results.txt
+backend/storage/
+
+# ─────────────────────────────────────────
+# Node / React / Vite
+# ─────────────────────────────────────────
+node_modules/
+dist/
+coverage/
+.vite/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+web/node_modules/
+web/dist/
+web/coverage/
+web/.vite/
+web/lint_output.txt
+
+# ─────────────────────────────────────────
+# Flutter / Dart (si se agrega mobile/)
 # ─────────────────────────────────────────
 mobile/.dart_tool/
 mobile/.flutter-plugins
@@ -24,59 +72,6 @@ mobile/.idea/
 mobile/*.iml
 
 # ─────────────────────────────────────────
-# Python / FastAPI  (backend/)
-# ─────────────────────────────────────────
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.pytest_cache/
-.ruff_cache/
-.coverage
-.coverage.*
-coverage.xml
-.python-version
-
-backend/__pycache__/
-backend/**/__pycache__/
-backend/**/*.py[cod]
-backend/.venv/
-backend/venv/
-backend/.pytest_cache/
-backend/.ruff_cache/
-backend/dist/
-backend/*.egg-info/
-backend/alembic/versions/*.pyc
-backend/test.db
-backend/.coverage
-backend/.coverage.*
-backend/coverage*.json
-backend/coverage.xml
-backend/coverage_output.txt
-backend/test_output.txt
-backend/test_results.txt
-
-# ─────────────────────────────────────────
-# Node / React  (web/)
-# ─────────────────────────────────────────
-node_modules/
-dist/
-.vite/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-web/node_modules/
-web/dist/
-web/.vite/
-web/lint_output.txt
-
-# ─────────────────────────────────────────
-# Archivos generados en raíz
-# ─────────────────────────────────────────
-/package-lock.json
-
-# ─────────────────────────────────────────
 # IDEs y editores
 # ─────────────────────────────────────────
 .idea/
@@ -88,14 +83,14 @@ web/lint_output.txt
 Thumbs.db
 
 # ─────────────────────────────────────────
-# Docker
+# Docker / tooling local
 # ─────────────────────────────────────────
 .docker/
 
 # ─────────────────────────────────────────
-# Documentación interna y configuración IA
+# Configuración local de asistentes / docs internas
 # ─────────────────────────────────────────
-.codex
+.codex/
 AGENTS.md
 docs/
 .github/instructions/

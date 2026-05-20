@@ -1,0 +1,208 @@
+.wrapper {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: linear-gradient(160deg, #ffffff 0%, #f4f8fc 100%);
+  border: 1px solid #d7e4f0;
+  border-radius: 18px;
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(15, 39, 64, 0.08);
+}
+
+.cardLabel {
+  display: block;
+  color: #526477;
+  font-size: 0.82rem;
+  margin-bottom: 0.4rem;
+}
+
+.cardValue {
+  color: #10273d;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.cardHint {
+  display: block;
+  color: #6f8192;
+  font-size: 0.82rem;
+  margin-top: 0.35rem;
+}
+
+.section {
+  background: #ffffff;
+  border: 1px solid #dce7ef;
+  border-radius: 22px;
+  padding: 1.25rem;
+  box-shadow: 0 12px 34px rgba(16, 39, 61, 0.08);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: #10273d;
+  font-size: 1.1rem;
+}
+
+.sectionText {
+  margin: 0.3rem 0 0;
+  color: #607386;
+  font-size: 0.92rem;
+}
+
+.findingList,
+.channelList,
+.metaList {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.findingItem,
+.channelItem {
+  border: 1px solid #d9e7ef;
+  border-radius: 18px;
+  padding: 1rem;
+  background: #f9fcff;
+}
+
+.findingTop,
+.channelTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.findingType,
+.channelTitle {
+  font-weight: 700;
+  color: #10273d;
+}
+
+.severity {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.critical {
+  background: #ffe0df;
+  color: #b42318;
+}
+
+.high {
+  background: #ffe9d6;
+  color: #b54708;
+}
+
+.medium {
+  background: #fff3c8;
+  color: #9a6700;
+}
+
+.low {
+  background: #dff7eb;
+  color: #0b7a48;
+}
+
+.findingMeta,
+.channelMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  color: #4f6477;
+  font-size: 0.9rem;
+  margin: 0.55rem 0;
+}
+
+.findingMessage,
+.findingRecommendation,
+.channelRecommendation {
+  margin: 0.45rem 0 0;
+  color: #25384a;
+  line-height: 1.45;
+}
+
+.emptyBox,
+.warningBox,
+.infoBox {
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.emptyBox {
+  background: #f6f8fa;
+  border: 1px dashed #c7d3de;
+  color: #53677a;
+}
+
+.warningBox {
+  background: #fff8db;
+  border: 1px solid #f3d46a;
+  color: #7c5c00;
+}
+
+.infoBox {
+  background: #edf6ff;
+  border: 1px solid #c2ddff;
+  color: #1f4f7a;
+}
+
+.metaList {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.metaItem {
+  border: 1px solid #d9e7ef;
+  border-radius: 16px;
+  padding: 0.9rem;
+  background: #f9fcff;
+}
+
+.metaItem strong {
+  display: block;
+  color: #10273d;
+  margin-bottom: 0.25rem;
+}
+
+.metaItem span {
+  color: #53677a;
+}
+
+.listInline {
+  margin: 0.35rem 0 0;
+  color: #33485b;
+  word-break: break-word;
+}
+
+@media (max-width: 720px) {
+  .sectionHeader,
+  .findingTop,
+  .channelTop {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

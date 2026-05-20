@@ -1,0 +1,142 @@
+.page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.title {
+  margin: 0;
+  color: #10273d;
+  font-size: clamp(1.8rem, 3vw, 2.45rem);
+  line-height: 1.05;
+}
+
+.subtitle {
+  margin: 0.4rem 0 0;
+  color: #5f7386;
+  max-width: 68ch;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #1f5f8b;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.toolbar {
+  display: grid;
+  gap: 1rem;
+  background:
+    radial-gradient(circle at top right, rgba(47, 132, 184, 0.14), transparent 34%),
+    linear-gradient(155deg, #ffffff 0%, #f2f8fd 100%);
+  border: 1px solid #d7e3ed;
+  border-radius: 24px;
+  padding: 1.2rem;
+  box-shadow: 0 14px 38px rgba(16, 39, 61, 0.1);
+}
+
+.secondaryToolbar {
+  display: grid;
+  gap: 1rem;
+  background: linear-gradient(165deg, #ffffff 0%, #fff9ef 100%);
+  border: 1px solid #e7dbc0;
+  border-radius: 24px;
+  padding: 1.2rem;
+  box-shadow: 0 14px 38px rgba(16, 39, 61, 0.08);
+}
+
+.toolbarTitle {
+  margin: 0;
+  color: #10273d;
+  font-size: 1.05rem;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.9rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.label {
+  color: #3b5368;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.input,
+.select {
+  width: 100%;
+  border: 1px solid #c9d8e5;
+  border-radius: 14px;
+  padding: 0.78rem 0.9rem;
+  background: #fff;
+  color: #10273d;
+  font: inherit;
+}
+
+.hint {
+  margin: 0;
+  color: #607386;
+  font-size: 0.86rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.checkbox {
+  display: inline-flex;
+  gap: 0.55rem;
+  align-items: center;
+  color: #364d61;
+  font-size: 0.94rem;
+}
+
+.statusBox,
+.errorBox {
+  border-radius: 20px;
+  padding: 1rem 1.1rem;
+}
+
+.statusBox {
+  background: #eef7ff;
+  border: 1px solid #cae1ff;
+  color: #215376;
+}
+
+.errorBox {
+  background: #fff0ef;
+  border: 1px solid #f4c7c3;
+  color: #9b2c24;
+}
+
+.metaLine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  color: #5d7184;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 720px) {
+  .header {
+    flex-direction: column;
+  }
+}

@@ -31,3 +31,11 @@ class Usuario(Base):
         back_populates="tecnico",
         lazy="dynamic",
     )
+    planos_subidos = relationship(
+        "Plano",
+        back_populates="uploaded_by_user",
+    )
+    wifi_scans = relationship(
+        "WifiScanLote",
+        back_populates="tecnico",
+    )

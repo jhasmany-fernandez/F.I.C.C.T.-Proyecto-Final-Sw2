@@ -17,5 +17,9 @@ class Settings(BaseSettings):
     debug: bool = False
     cors_origins: list[str] = ["http://localhost", "http://localhost:5173"]
 
+    # Storage local de planos
+    plano_storage_dir: str = "storage/planos"
+    plano_max_size_bytes: int = 10 * 1024 * 1024
+
 
 settings = Settings()

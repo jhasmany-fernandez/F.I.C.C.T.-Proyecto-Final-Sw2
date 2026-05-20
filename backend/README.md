@@ -71,3 +71,5 @@ tests/
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `60`                                                       | Expiración del token          |
 | `DEBUG`                       | `false`                                                    | Modo debug                    |
 | `CORS_ORIGINS`                | `["http://localhost","http://localhost:5173"]`             | Orígenes CORS permitidos      |
+| `PLANO_STORAGE_DIR`           | `storage/planos`                                           | Carpeta local segura para planos |
+| `PLANO_MAX_SIZE_BYTES`        | `10485760`                                                 | Tamaño máximo permitido por archivo |

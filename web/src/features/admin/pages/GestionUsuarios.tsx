@@ -4,6 +4,7 @@
  */
 
 import { useState } from "react";
+import { AxiosError } from "axios";
 import { UserPlus } from "lucide-react";
 import { useActualizarUsuario, useUsuarios } from "../hooks/useUsuarios";
 import type { UsuarioOut } from "../types";
@@ -14,7 +15,8 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import styles from "./GestionUsuarios.module.css";
 
 export default function GestionUsuarios() {
-  const { data: usuarios, isLoading, isError, isFetching } = useUsuarios();
+  const { data: usuarios, isLoading, isError, isFetching, error } =
+    useUsuarios();
   const { mutateAsync: actualizar, isPending: actualizando } =
     useActualizarUsuario();
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -55,7 +57,7 @@ export default function GestionUsuarios() {
   if (isError) {
     return (
       <div className={styles.estadoCentrado}>
-        <p className={styles.error}>Error al cargar los usuarios.</p>
+        <p className={styles.error}>{mapUsuariosError(error)}</p>
       </div>
     );
   }
@@ -151,4 +153,23 @@ export default function GestionUsuarios() {
       )}
     </div>
   );
+}
+
+function mapUsuariosError(error: unknown): string {
+  if (error instanceof AxiosError) {
+    if (error.code === "ECONNABORTED") {
+      return "El backend tardó demasiado en responder al cargar usuarios.";
+    }
+    if (!error.response) {
+      return "No se pudo conectar con el backend para cargar usuarios.";
+    }
+    if (error.response.status === 401) {
+      return "La sesión expiró. Vuelve a iniciar sesión.";
+    }
+    if (error.response.status === 403) {
+      return "No tienes permisos para ver usuarios.";
+    }
+  }
+
+  return "Error al cargar los usuarios.";
 }

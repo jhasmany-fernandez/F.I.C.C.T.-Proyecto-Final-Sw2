@@ -7,6 +7,7 @@
 
 import { useState } from "react";
 import { Archive, UserCog } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useUsuarios } from "../hooks/useUsuarios";
 import {
   useArchivarProyectoAdmin,
@@ -27,6 +28,7 @@ const ESTADOS = [
 ];
 
 export default function ListadoProyectosOrg() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [filtros, setFiltros] = useState<ProyectosFilter>({});
 
@@ -194,6 +196,15 @@ export default function ListadoProyectosOrg() {
                         >
                           <UserCog size={14} aria-hidden="true" />
                           Reasignar
+                        </Button>
+                        <Button
+                          variante="ghost"
+                          tamano="sm"
+                          onClick={() =>
+                            navigate(`/admin/proyectos/${p.id}/diagnostico`)
+                          }
+                        >
+                          Ver diagnóstico
                         </Button>
                       </div>
                     </td>
