@@ -180,6 +180,7 @@ export default function ListadoProyectosOrg() {
                           <Button
                             variante="danger"
                             tamano="sm"
+                            className={styles.botonAccionPeligro}
                             onClick={() => setProyectoArchivar(p)}
                             isLoading={
                               archivando && proyectoArchivar?.id === p.id
@@ -192,6 +193,7 @@ export default function ListadoProyectosOrg() {
                         <Button
                           variante="secondary"
                           tamano="sm"
+                          className={styles.botonAccion}
                           onClick={() => handleAbrirReasignar(p)}
                         >
                           <UserCog size={14} aria-hidden="true" />
@@ -200,6 +202,7 @@ export default function ListadoProyectosOrg() {
                         <Button
                           variante="ghost"
                           tamano="sm"
+                          className={styles.botonAccionGhost}
                           onClick={() =>
                             navigate(`/admin/proyectos/${p.id}/diagnostico`)
                           }

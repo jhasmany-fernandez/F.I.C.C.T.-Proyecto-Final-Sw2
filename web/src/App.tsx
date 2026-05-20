@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import LoginAdmin from "@/features/auth/pages/LoginAdmin";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import AdminLayout from "@/features/admin/pages/AdminLayout";
@@ -8,15 +8,7 @@ import GestionUsuarios from "@/features/admin/pages/GestionUsuarios";
 import GestionClientes from "@/features/admin/pages/GestionClientes";
 import ListadoProyectosOrg from "@/features/admin/pages/ListadoProyectosOrg";
 import CoverageAnalysisPage from "@/features/admin/pages/CoverageAnalysisPage";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      staleTime: 30_000,
-    },
-  },
-});
+import { queryClient } from "@/shared/api/queryClient";
 
 function AppRoutes() {
   const cargarSesion = useAuth((s) => s.cargarSesion);

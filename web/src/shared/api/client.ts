@@ -8,6 +8,9 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 
 const STORAGE_ACCESS = "access_token";
 const STORAGE_REFRESH = "refresh_token";
+const STORAGE_USER = "usuario";
+const STORAGE_REMEMBER = "remember_session";
+const STORAGE_REMEMBERED_EMAIL = "remembered_email";
 
 export const apiClient = axios.create({
   baseURL: "/api",
@@ -17,7 +20,7 @@ export const apiClient = axios.create({
 
 // ── Interceptor de request: adjunta Bearer token ──────────────────────────
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = localStorage.getItem(STORAGE_ACCESS);
+  const token = getStoredValue(STORAGE_ACCESS);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -50,7 +53,7 @@ apiClient.interceptors.response.use(
     };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      const refreshToken = localStorage.getItem(STORAGE_REFRESH);
+      const refreshToken = getStoredValue(STORAGE_REFRESH);
 
       if (!refreshToken) {
         _redirigirALogin();
@@ -74,7 +77,7 @@ apiClient.interceptors.response.use(
           "/api/auth/refresh",
           { refresh_token: refreshToken },
         );
-        localStorage.setItem(STORAGE_ACCESS, data.access_token);
+        setStoredValue(STORAGE_ACCESS, data.access_token, shouldRememberSession());
         apiClient.defaults.headers.common.Authorization = `Bearer ${data.access_token}`;
         procesarCola(null, data.access_token);
         originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
@@ -93,13 +96,58 @@ apiClient.interceptors.response.use(
 );
 
 function _redirigirALogin() {
-  localStorage.removeItem(STORAGE_ACCESS);
-  localStorage.removeItem(STORAGE_REFRESH);
-  localStorage.removeItem("usuario");
+  clearSessionStorage();
   // Evitar redirección en bucle si ya estamos en login
   if (!window.location.pathname.includes("/admin/login")) {
     window.location.href = "/admin/login";
   }
 }
 
-export { STORAGE_ACCESS, STORAGE_REFRESH };
+function getStorage(remember: boolean): Storage {
+  return remember ? localStorage : sessionStorage;
+}
+
+function getStoredValue(key: string): string | null {
+  return localStorage.getItem(key) ?? sessionStorage.getItem(key);
+}
+
+function setStoredValue(key: string, value: string, remember: boolean) {
+  localStorage.removeItem(key);
+  sessionStorage.removeItem(key);
+  getStorage(remember).setItem(key, value);
+}
+
+function shouldRememberSession(): boolean {
+  return localStorage.getItem(STORAGE_REMEMBER) === "true";
+}
+
+function setRememberSession(remember: boolean) {
+  if (remember) {
+    localStorage.setItem(STORAGE_REMEMBER, "true");
+  } else {
+    localStorage.removeItem(STORAGE_REMEMBER);
+  }
+}
+
+function clearSessionStorage() {
+  localStorage.removeItem(STORAGE_ACCESS);
+  localStorage.removeItem(STORAGE_REFRESH);
+  localStorage.removeItem(STORAGE_USER);
+  localStorage.removeItem(STORAGE_REMEMBER);
+  sessionStorage.removeItem(STORAGE_ACCESS);
+  sessionStorage.removeItem(STORAGE_REFRESH);
+  sessionStorage.removeItem(STORAGE_USER);
+}
+
+export {
+  STORAGE_ACCESS,
+  STORAGE_REFRESH,
+  STORAGE_REMEMBER,
+  STORAGE_REMEMBERED_EMAIL,
+  STORAGE_USER,
+  clearSessionStorage,
+  getStoredValue,
+  setRememberSession,
+  setStoredValue,
+  shouldRememberSession,
+};

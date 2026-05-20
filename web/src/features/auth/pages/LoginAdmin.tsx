@@ -6,24 +6,31 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Radio } from "lucide-react";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import {
+  clearRememberedEmail,
+  getRememberedEmail,
+  setRememberedEmail,
+  useAuth,
+} from "@/features/auth/hooks/useAuth";
 import { Button } from "@/shared/components";
 import styles from "./LoginAdmin.module.css";
 
 export default function LoginAdmin() {
   const navigate = useNavigate();
-  const { iniciarSesion, isLoading, error, isAuthenticated } = useAuth();
+  const { iniciarSesion, isLoading, error, isAuthenticated, usuario } =
+    useAuth();
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => getRememberedEmail());
   const [password, setPassword] = useState("");
   const [mostrarPassword, setMostrarPassword] = useState(false);
+  const [recordarme, setRecordarme] = useState(() => !!getRememberedEmail());
   const [errLocal, setErrLocal] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && usuario?.rol === "admin") {
       navigate("/admin/usuarios", { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, usuario]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +40,13 @@ export default function LoginAdmin() {
       return;
     }
     try {
-      await iniciarSesion(email.trim(), password);
+      const emailNormalizado = email.trim();
+      await iniciarSesion(emailNormalizado, password, recordarme);
+      if (recordarme) {
+        setRememberedEmail(emailNormalizado);
+      } else {
+        clearRememberedEmail();
+      }
       navigate("/admin/usuarios", { replace: true });
     } catch {
       // El error ya está en el store
@@ -103,6 +116,16 @@ export default function LoginAdmin() {
               )}
             </button>
           </div>
+
+          <label className={styles.recordarme}>
+            <input
+              type="checkbox"
+              checked={recordarme}
+              onChange={(e) => setRecordarme(e.target.checked)}
+              disabled={isLoading}
+            />
+            <span>Recuérdame</span>
+          </label>
 
           <Button
             type="submit"

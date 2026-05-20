@@ -10,39 +10,39 @@
 }
 
 .card {
-  background: linear-gradient(160deg, #ffffff 0%, #f4f8fc 100%);
-  border: 1px solid #d7e4f0;
+  background: linear-gradient(160deg, #1b2231 0%, #161d2a 100%);
+  border: 1px solid rgba(118, 136, 182, 0.22);
   border-radius: 18px;
   padding: 1rem;
-  box-shadow: 0 10px 30px rgba(15, 39, 64, 0.08);
+  box-shadow: 0 10px 30px rgba(3, 7, 18, 0.28);
 }
 
 .cardLabel {
   display: block;
-  color: #526477;
+  color: #9ba9c4;
   font-size: 0.82rem;
   margin-bottom: 0.4rem;
 }
 
 .cardValue {
-  color: #10273d;
+  color: #eef3ff;
   font-size: 1.8rem;
   font-weight: 700;
 }
 
 .cardHint {
   display: block;
-  color: #6f8192;
+  color: #8998b5;
   font-size: 0.82rem;
   margin-top: 0.35rem;
 }
 
 .section {
-  background: #ffffff;
-  border: 1px solid #dce7ef;
+  background: linear-gradient(170deg, #1b2231 0%, #161d29 100%);
+  border: 1px solid rgba(118, 136, 182, 0.22);
   border-radius: 22px;
   padding: 1.25rem;
-  box-shadow: 0 12px 34px rgba(16, 39, 61, 0.08);
+  box-shadow: 0 12px 34px rgba(3, 7, 18, 0.3);
 }
 
 .sectionHeader {
@@ -55,13 +55,13 @@
 
 .sectionTitle {
   margin: 0;
-  color: #10273d;
+  color: #edf3ff;
   font-size: 1.1rem;
 }
 
 .sectionText {
   margin: 0.3rem 0 0;
-  color: #607386;
+  color: #90a0ba;
   font-size: 0.92rem;
 }
 
@@ -74,10 +74,10 @@
 
 .findingItem,
 .channelItem {
-  border: 1px solid #d9e7ef;
+  border: 1px solid rgba(118, 136, 182, 0.18);
   border-radius: 18px;
   padding: 1rem;
-  background: #f9fcff;
+  background: rgba(20, 26, 39, 0.78);
 }
 
 .findingTop,
@@ -92,7 +92,7 @@
 .findingType,
 .channelTitle {
   font-weight: 700;
-  color: #10273d;
+  color: #eef3ff;
 }
 
 .severity {
@@ -131,7 +131,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem 1rem;
-  color: #4f6477;
+  color: #93a2bc;
   font-size: 0.9rem;
   margin: 0.55rem 0;
 }
@@ -140,7 +140,7 @@
 .findingRecommendation,
 .channelRecommendation {
   margin: 0.45rem 0 0;
-  color: #25384a;
+  color: #c7d2e8;
   line-height: 1.45;
 }
 
@@ -154,21 +154,21 @@
 }
 
 .emptyBox {
-  background: #f6f8fa;
-  border: 1px dashed #c7d3de;
-  color: #53677a;
+  background: rgba(23, 29, 43, 0.88);
+  border: 1px dashed rgba(126, 140, 174, 0.26);
+  color: #aab8d1;
 }
 
 .warningBox {
-  background: #fff8db;
-  border: 1px solid #f3d46a;
-  color: #7c5c00;
+  background: rgba(120, 88, 14, 0.18);
+  border: 1px solid rgba(232, 191, 79, 0.42);
+  color: #f0d998;
 }
 
 .infoBox {
-  background: #edf6ff;
-  border: 1px solid #c2ddff;
-  color: #1f4f7a;
+  background: rgba(28, 58, 112, 0.22);
+  border: 1px solid rgba(103, 154, 255, 0.24);
+  color: #c9dcff;
 }
 
 .metaList {
@@ -176,25 +176,25 @@
 }
 
 .metaItem {
-  border: 1px solid #d9e7ef;
+  border: 1px solid rgba(118, 136, 182, 0.18);
   border-radius: 16px;
   padding: 0.9rem;
-  background: #f9fcff;
+  background: rgba(20, 26, 39, 0.78);
 }
 
 .metaItem strong {
   display: block;
-  color: #10273d;
+  color: #eef3ff;
   margin-bottom: 0.25rem;
 }
 
 .metaItem span {
-  color: #53677a;
+  color: #9caacc;
 }
 
 .listInline {
   margin: 0.35rem 0 0;
-  color: #33485b;
+  color: #c4d0e7;
   word-break: break-word;
 }
 

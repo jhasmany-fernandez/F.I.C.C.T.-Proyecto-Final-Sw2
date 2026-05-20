@@ -114,6 +114,24 @@
   color: var(--text-h);
 }
 
+.recordarme {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.recordarme input {
+  margin: 0;
+  accent-color: var(--color-primary);
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
 .botonSubmit {
   margin-top: 1rem;
 }

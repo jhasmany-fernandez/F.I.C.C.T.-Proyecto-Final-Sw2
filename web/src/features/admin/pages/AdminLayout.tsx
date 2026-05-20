@@ -4,7 +4,7 @@
  * Sprint 1 — PB-13, PB-18.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   NavLink,
   Navigate,
@@ -13,6 +13,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import {
+  Bell,
   Radio,
   Users,
   Building2,
@@ -47,12 +48,28 @@ export default function AdminLayout() {
   const [menuAbiertoEn, setMenuAbiertoEn] = useState<string | null>(null);
   const menuAbierto = menuAbiertoEn === location.pathname;
 
+  useEffect(() => {
+    if (isReady && isAuthenticated && usuario?.rol !== "admin") {
+      void cerrarSesion().finally(() => {
+        navigate("/admin/login", { replace: true });
+      });
+    }
+  }, [cerrarSesion, isAuthenticated, isReady, navigate, usuario]);
+
   if (!isReady) {
     return <main className={styles.estadoPantalla}>Cargando sesión…</main>;
   }
 
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" replace />;
+  }
+
+  if (usuario?.rol !== "admin") {
+    return (
+      <main className={styles.estadoPantalla}>
+        Verificando permisos del panel administrativo…
+      </main>
+    );
   }
 
   const handleLogout = async () => {
@@ -84,20 +101,14 @@ export default function AdminLayout() {
       </ul>
 
       <div className={styles.perfil}>
-        <div className={styles.avatar} aria-hidden="true">
-          {iniciales(usuario?.nombre ?? "A")}
+        <div className={styles.identidad}>
+          <div className={styles.avatar} aria-hidden="true">
+            {iniciales(usuario?.nombre ?? "A")}
+          </div>
+          <span className={styles.nombreUsuario}>
+            {usuario?.nombre ?? "Admin"}
+          </span>
         </div>
-        <span className={styles.nombreUsuario}>
-          {usuario?.nombre ?? "Admin"}
-        </span>
-        <button
-          onClick={handleLogout}
-          className={styles.botonSalir}
-          aria-label="Cerrar sesión"
-        >
-          <LogOut size={14} aria-hidden="true" />
-          Cerrar sesión
-        </button>
       </div>
     </nav>
   );
@@ -138,7 +149,42 @@ export default function AdminLayout() {
       </div>
 
       <main className={styles.contenido}>
-        <Outlet />
+        <header className={styles.topbar}>
+          <div className={styles.topbarSpacer} />
+
+          <div className={styles.topbarAcciones}>
+            <div className={styles.topbarUsuario}>
+              <div className={styles.avatar} aria-hidden="true">
+                {iniciales(usuario?.nombre ?? "A")}
+              </div>
+              <span className={styles.topbarNombre}>
+                {usuario?.nombre ?? "Admin"}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className={styles.botonNotificaciones}
+              aria-label="Notificaciones"
+              title="Notificaciones"
+            >
+              <Bell size={16} aria-hidden="true" />
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className={styles.botonSalirTopbar}
+              aria-label="Cerrar sesión"
+              title="Cerrar sesión"
+            >
+              <LogOut size={14} aria-hidden="true" />
+            </button>
+          </div>
+        </header>
+
+        <div className={styles.contenidoInterno}>
+          <Outlet />
+        </div>
       </main>
 
       <ToastContainer />

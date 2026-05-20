@@ -126,6 +126,51 @@
   gap: 0.5rem;
   flex-wrap: wrap;
   justify-content: flex-start;
+  align-items: center;
+}
+
+.botonAccion,
+.botonAccionPeligro,
+.botonAccionGhost {
+  min-width: unset;
+  width: auto;
+  flex: 0 0 auto;
+  min-height: 1.95rem;
+  line-height: 1;
+  border-radius: 0.78rem;
+  padding-inline: 0.72rem;
+}
+
+.botonAccion {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: #1d202b;
+  color: #c6cada;
+}
+
+.botonAccion:hover:not(:disabled) {
+  background: #242734;
+}
+
+.botonAccionPeligro {
+  border: 1px solid rgba(255, 130, 130, 0.16);
+  background: #f9eded;
+  color: #df3b35;
+}
+
+.botonAccionPeligro:hover:not(:disabled) {
+  background: #f4e2e2;
+}
+
+.botonAccionGhost {
+  border: 1px solid rgba(77, 139, 255, 0.26);
+  color: #d7e6ff;
+  background: rgba(33, 77, 164, 0.3);
+}
+
+.botonAccionGhost:hover:not(:disabled) {
+  border-color: rgba(103, 160, 255, 0.42);
+  color: #eef4ff;
+  background: rgba(43, 94, 196, 0.42);
 }
 
 /* Modal de reasignación */
