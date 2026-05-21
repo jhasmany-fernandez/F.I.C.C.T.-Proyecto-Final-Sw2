@@ -7,11 +7,7 @@ from app.core.database import Base
 # Importar todos los modelos para que Alembic los detecte en autogenerate
 from app.models import usuario  # noqa: F401
 from app.models import refresh_token  # noqa: F401
-from app.models import cliente  # noqa: F401
 from app.models import proyecto  # noqa: F401
-from app.models import plano  # noqa: F401
-from app.models import punto_medicion  # noqa: F401
-from app.models import wifi_scan  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)

@@ -1,5 +1,5 @@
 .container {
-  min-height: 100svh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -114,47 +114,15 @@
   color: var(--text-h);
 }
 
-.recordarme {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  margin-top: 0.9rem;
-  color: var(--text);
-  font-size: 0.9rem;
-  cursor: pointer;
-  user-select: none;
-}
-
-.recordarme input {
-  margin: 0;
-  accent-color: var(--color-primary);
-  inline-size: 1rem;
-  block-size: 1rem;
-}
-
 .botonSubmit {
   margin-top: 1rem;
 }
 
 /* Responsive */
 @media (max-width: 480px) {
-  .container {
-    align-items: stretch;
-    padding: 0.75rem;
-  }
-
   .card {
-    margin: auto 0;
     padding: 2rem 1.25rem;
     border-radius: var(--radius-lg);
     box-shadow: none;
-  }
-
-  .titulo {
-    font-size: 1.25rem;
-  }
-
-  .subtitulo {
-    margin-bottom: 1.5rem;
   }
 }

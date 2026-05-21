@@ -1,8 +1,6 @@
 services:
   db:
     image: postgres:15-alpine
-    ports:
-      - "${DB_BIND_HOST:-127.0.0.1}:${DB_HOST_PORT:-5435}:5432"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-heatmapper}
       POSTGRES_USER: ${POSTGRES_USER:-heatmapper_user}
@@ -32,6 +30,12 @@ services:
       SECRET_KEY: ${SECRET_KEY:-cambia_esto_por_un_secreto_seguro}
       ALGORITHM: ${ALGORITHM:-HS256}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+      STORAGE_ROOT: ${STORAGE_ROOT:-/var/lib/heatmapper/planos}
+      STORAGE_URL_SECRET: ${STORAGE_URL_SECRET:-cambia_esto_por_un_secreto_de_storage}
+      STORAGE_URL_TTL_SECONDS: ${STORAGE_URL_TTL_SECONDS:-3600}
+      PUBLIC_API_URL: ${PUBLIC_API_URL:-}
+    volumes:
+      - planos_data:/var/lib/heatmapper/planos
     depends_on:
       db:
         condition: service_healthy
@@ -60,7 +64,7 @@ services:
   nginx:
     image: nginx:1.27-alpine
     ports:
-      - "${NGINX_BIND_HOST:-0.0.0.0}:${NGINX_HOST_PORT:-8081}:80"
+      - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
@@ -72,6 +76,7 @@ services:
 
 volumes:
   postgres_data:
+  planos_data:
 
 networks:
   heatmapper-net:

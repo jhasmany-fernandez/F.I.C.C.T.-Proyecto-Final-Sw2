@@ -1,249 +1,312 @@
-from pathlib import Path
+"""Tests Sprint 2 — PB-02 (Importar Plano) y PB-11 (Calibrar Escala)."""
 
+import io
+import tempfile
+import time
+
+import fitz  # PyMuPDF
 import pytest
-from fastapi.testclient import TestClient
+from PIL import Image
 
 from app.core.config import settings
-from app.models.cliente import Cliente
-from app.models.plano import Plano
-from app.models.proyecto import Proyecto
-from app.models.usuario import Usuario
+from app.storage.signing import generar_url_firmada, verificar_firma
 
 
-@pytest.fixture
-def plano_storage_tmp(tmp_path, monkeypatch) -> Path:
-    storage_dir = tmp_path / "planos"
-    monkeypatch.setattr(settings, "plano_storage_dir", str(storage_dir))
-    monkeypatch.setattr(settings, "plano_max_size_bytes", 1024)
-    return storage_dir
+@pytest.fixture(autouse=True)
+def storage_temporal(monkeypatch):
+    with tempfile.TemporaryDirectory() as tmp:
+        monkeypatch.setattr(settings, "storage_root", tmp)
+        monkeypatch.setattr(settings, "storage_url_secret", "test_secret_32chars_minimo_xxxxxx")
+        monkeypatch.setattr(settings, "storage_url_ttl_seconds", 60)
+        monkeypatch.setattr(settings, "public_api_url", "")
+        yield tmp
 
 
-@pytest.fixture
-def cliente_seed(db_session) -> Cliente:
-    cliente = Cliente(nombre="Cliente Planos")
-    db_session.add(cliente)
-    db_session.commit()
-    db_session.refresh(cliente)
-    return cliente
-
-
-@pytest.fixture
-def proyecto_propio(db_session, tecnico_usuario: Usuario, cliente_seed: Cliente) -> Proyecto:
-    proyecto = Proyecto(
-        nombre="Proyecto con plano",
-        cliente_id=cliente_seed.id,
-        estado="en_progreso",
-        tecnico_id=tecnico_usuario.id,
+def _crear_proyecto(client, token, nombre="Proyecto Plano"):
+    r = client.post(
+        "/proyectos",
+        json={"nombre": nombre},
+        headers={"Authorization": f"Bearer {token}"},
     )
-    db_session.add(proyecto)
-    db_session.commit()
-    db_session.refresh(proyecto)
-    return proyecto
+    assert r.status_code == 201, r.text
+    return r.json()["id"]
 
 
-@pytest.fixture
-def otro_tecnico(db_session) -> Usuario:
-    usuario = Usuario(
-        nombre="Otro Técnico",
-        email="otro.tecnico@test.bo",
-        password_hash="hash-no-importa",
-        rol="tecnico",
-        activo=True,
-    )
-    db_session.add(usuario)
-    db_session.commit()
-    db_session.refresh(usuario)
-    return usuario
+def _png_bytes(ancho=200, alto=100) -> bytes:
+    buf = io.BytesIO()
+    Image.new("RGB", (ancho, alto), color=(255, 0, 0)).save(buf, format="PNG")
+    return buf.getvalue()
 
 
-@pytest.fixture
-def proyecto_ajeno(db_session, otro_tecnico: Usuario, cliente_seed: Cliente) -> Proyecto:
-    proyecto = Proyecto(
-        nombre="Proyecto ajeno",
-        cliente_id=cliente_seed.id,
-        estado="en_progreso",
-        tecnico_id=otro_tecnico.id,
-    )
-    db_session.add(proyecto)
-    db_session.commit()
-    db_session.refresh(proyecto)
-    return proyecto
+def _jpg_bytes(ancho=120, alto=80) -> bytes:
+    buf = io.BytesIO()
+    Image.new("RGB", (ancho, alto), color=(0, 0, 255)).save(buf, format="JPEG")
+    return buf.getvalue()
 
 
-def test_subir_plano_pdf_crea_metadata_y_archivo(
-    client: TestClient,
-    tecnico_token: str,
-    proyecto_propio: Proyecto,
-    plano_storage_tmp: Path,
-):
-    response = client.post(
-        f"/proyectos/{proyecto_propio.id}/plano",
+def _pdf_bytes(paginas=1) -> bytes:
+    doc = fitz.open()
+    for _ in range(paginas):
+        doc.new_page(width=200, height=100)
+    data = doc.tobytes()
+    doc.close()
+    return data
+
+
+# ---------- PB-02: importar plano ----------
+
+
+def test_importar_plano_png(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    files = {"archivo": ("piso1.png", _png_bytes(), "image/png")}
+    r = client.post(
+        f"/proyectos/{pid}/planos",
+        files=files,
         headers={"Authorization": f"Bearer {tecnico_token}"},
-        files={"archivo": ("plano.pdf", b"%PDF-1.4 plano demo", "application/pdf")},
     )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["formato"] == "png"
+    assert body["ancho_px"] == 200 and body["alto_px"] == 100
+    assert body["calibrado"] is False
+    assert body["warning"] is None
+    assert "/planos/archivo/" in body["url_firmada"]
 
-    assert response.status_code == 201
-    data = response.json()
-    assert data["proyecto_id"] == proyecto_propio.id
-    assert data["nombre_archivo"] == "plano.pdf"
-    assert data["mime_type"] == "application/pdf"
-    assert data["size_bytes"] > 0
-    assert any(plano_storage_tmp.rglob("*.pdf"))
+
+def test_importar_plano_jpg(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    files = {"archivo": ("piso.jpg", _jpg_bytes(), "image/jpeg")}
+    r = client.post(
+        f"/proyectos/{pid}/planos",
+        files=files,
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r.status_code == 201
+    assert r.json()["formato"] == "jpg"
 
 
-def test_get_plano_retorna_metadata(
-    client: TestClient,
-    tecnico_token: str,
-    proyecto_propio: Proyecto,
-    plano_storage_tmp: Path,
+def test_importar_pdf_una_pagina(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    files = {"archivo": ("plan.pdf", _pdf_bytes(1), "application/pdf")}
+    r = client.post(
+        f"/proyectos/{pid}/planos",
+        files=files,
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r.status_code == 201
+    body = r.json()
+    assert body["formato"] == "pdf"
+    assert body["warning"] is None
+    assert body["ancho_px"] > 0
+
+
+def test_importar_pdf_multipagina_genera_warning(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    files = {"archivo": ("plan.pdf", _pdf_bytes(3), "application/pdf")}
+    r = client.post(
+        f"/proyectos/{pid}/planos",
+        files=files,
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r.status_code == 201
+    body = r.json()
+    assert body["warning"] is not None
+    assert "3" in body["warning"]
+
+
+def test_importar_formato_no_soportado(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    files = {"archivo": ("plano.tiff", b"\x00\x00", "image/tiff")}
+    r = client.post(
+        f"/proyectos/{pid}/planos",
+        files=files,
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r.status_code == 415
+
+
+def test_importar_tamano_excedido(client, tecnico_token, monkeypatch):
+    from app.api.v1 import planos as planos_mod
+
+    monkeypatch.setattr(planos_mod, "MAX_BYTES", 100)
+    pid = _crear_proyecto(client, tecnico_token)
+    files = {"archivo": ("piso.png", _png_bytes(300, 300), "image/png")}
+    r = client.post(
+        f"/proyectos/{pid}/planos",
+        files=files,
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r.status_code == 413
+
+
+def test_importar_proyecto_ajeno_devuelve_404(
+    client,
+    tecnico_token,
+    admin_token,
+    admin_usuario,
 ):
+    # Crear proyecto como admin (otro técnico/usuario)
+    r = client.post(
+        "/proyectos",
+        json={"nombre": "Ajeno"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 201
+    pid_ajeno = r.json()["id"]
+
+    files = {"archivo": ("p.png", _png_bytes(), "image/png")}
+    r = client.post(
+        f"/proyectos/{pid_ajeno}/planos",
+        files=files,
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r.status_code == 404
+
+
+def test_listar_planos(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
     client.post(
-        f"/proyectos/{proyecto_propio.id}/plano",
-        headers={"Authorization": f"Bearer {tecnico_token}"},
-        files={"archivo": ("plano.png", b"\x89PNG\r\n\x1a\ncontenido", "image/png")},
-    )
-
-    response = client.get(
-        f"/proyectos/{proyecto_propio.id}/plano",
+        f"/proyectos/{pid}/planos",
+        files={"archivo": ("p1.png", _png_bytes(), "image/png")},
         headers={"Authorization": f"Bearer {tecnico_token}"},
     )
-
-    assert response.status_code == 200
-    assert response.json()["nombre_archivo"] == "plano.png"
-
-
-def test_download_plano_retorna_archivo(
-    client: TestClient,
-    tecnico_token: str,
-    proyecto_propio: Proyecto,
-    plano_storage_tmp: Path,
-):
-    contenido = b"\xff\xd8\xff\xe0jpg-demo"
     client.post(
-        f"/proyectos/{proyecto_propio.id}/plano",
-        headers={"Authorization": f"Bearer {tecnico_token}"},
-        files={"archivo": ("plano.jpg", contenido, "image/jpeg")},
-    )
-
-    response = client.get(
-        f"/proyectos/{proyecto_propio.id}/plano/download",
+        f"/proyectos/{pid}/planos",
+        files={"archivo": ("p2.png", _png_bytes(), "image/png")},
         headers={"Authorization": f"Bearer {tecnico_token}"},
     )
-
-    assert response.status_code == 200
-    assert response.content == contenido
-    assert response.headers["content-type"] == "image/jpeg"
-    assert "plano.jpg" in response.headers["content-disposition"]
-
-
-def test_nueva_subida_reemplaza_plano_anterior_y_borra_archivo_viejo(
-    client: TestClient,
-    db_session,
-    tecnico_token: str,
-    proyecto_propio: Proyecto,
-    plano_storage_tmp: Path,
-):
-    primera = client.post(
-        f"/proyectos/{proyecto_propio.id}/plano",
-        headers={"Authorization": f"Bearer {tecnico_token}"},
-        files={"archivo": ("primero.pdf", b"%PDF-1.4 primero", "application/pdf")},
-    )
-    assert primera.status_code == 201
-
-    plano = db_session.query(Plano).filter(Plano.proyecto_id == proyecto_propio.id).first()
-    assert plano is not None
-    ruta_vieja = plano.ruta_archivo
-    archivo_viejo = plano_storage_tmp / ruta_vieja
-    assert archivo_viejo.exists()
-
-    segunda = client.post(
-        f"/proyectos/{proyecto_propio.id}/plano",
-        headers={"Authorization": f"Bearer {tecnico_token}"},
-        files={"archivo": ("segundo.pdf", b"%PDF-1.4 segundo", "application/pdf")},
-    )
-    assert segunda.status_code == 201
-
-    plano_actual = db_session.query(Plano).filter(Plano.proyecto_id == proyecto_propio.id).all()
-    assert len(plano_actual) == 1
-    assert plano_actual[0].nombre_archivo == "segundo.pdf"
-    assert plano_actual[0].ruta_archivo != ruta_vieja
-    assert not archivo_viejo.exists()
-    assert (plano_storage_tmp / plano_actual[0].ruta_archivo).exists()
-
-
-def test_proyecto_ajeno_devuelve_404(
-    client: TestClient,
-    tecnico_token: str,
-    proyecto_ajeno: Proyecto,
-    plano_storage_tmp: Path,
-):
-    response = client.post(
-        f"/proyectos/{proyecto_ajeno.id}/plano",
-        headers={"Authorization": f"Bearer {tecnico_token}"},
-        files={"archivo": ("plano.pdf", b"%PDF-1.4 demo", "application/pdf")},
-    )
-
-    assert response.status_code == 404
-
-
-def test_proyecto_archivado_devuelve_409(
-    client: TestClient,
-    db_session,
-    tecnico_token: str,
-    proyecto_propio: Proyecto,
-    plano_storage_tmp: Path,
-):
-    proyecto_propio.estado = "archivado"
-    db_session.commit()
-
-    response = client.post(
-        f"/proyectos/{proyecto_propio.id}/plano",
-        headers={"Authorization": f"Bearer {tecnico_token}"},
-        files={"archivo": ("plano.pdf", b"%PDF-1.4 demo", "application/pdf")},
-    )
-
-    assert response.status_code == 409
-
-
-def test_formato_no_permitido_devuelve_415(
-    client: TestClient,
-    tecnico_token: str,
-    proyecto_propio: Proyecto,
-    plano_storage_tmp: Path,
-):
-    response = client.post(
-        f"/proyectos/{proyecto_propio.id}/plano",
-        headers={"Authorization": f"Bearer {tecnico_token}"},
-        files={"archivo": ("plano.txt", b"texto", "text/plain")},
-    )
-
-    assert response.status_code == 415
-
-
-def test_archivo_obligatorio_devuelve_422(
-    client: TestClient,
-    tecnico_token: str,
-    proyecto_propio: Proyecto,
-    plano_storage_tmp: Path,
-):
-    response = client.post(
-        f"/proyectos/{proyecto_propio.id}/plano",
+    r = client.get(
+        f"/proyectos/{pid}/planos",
         headers={"Authorization": f"Bearer {tecnico_token}"},
     )
+    assert r.status_code == 200
+    assert len(r.json()) == 2
 
-    assert response.status_code == 422
+
+# ---------- PB-11: calibrar escala ----------
 
 
-def test_tamano_maximo_configurable_devuelve_413(
-    client: TestClient,
-    tecnico_token: str,
-    proyecto_propio: Proyecto,
-    plano_storage_tmp: Path,
-):
-    response = client.post(
-        f"/proyectos/{proyecto_propio.id}/plano",
-        headers={"Authorization": f"Bearer {tecnico_token}"},
-        files={"archivo": ("plano.pdf", b"x" * 2048, "application/pdf")},
+def _subir_plano(client, token, pid) -> dict:
+    r = client.post(
+        f"/proyectos/{pid}/planos",
+        files={"archivo": ("p.png", _png_bytes(1000, 500), "image/png")},
+        headers={"Authorization": f"Bearer {token}"},
     )
+    assert r.status_code == 201, r.text
+    return r.json()
 
-    assert response.status_code == 413
+
+def test_calibrar_plano_valido(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    plano = _subir_plano(client, tecnico_token, pid)
+    body = {
+        "x1": 100,
+        "y1": 100,
+        "x2": 200,
+        "y2": 100,
+        "distancia_real_m": 10,
+    }
+    r = client.patch(
+        f"/planos/{plano['id']}/calibracion",
+        json=body,
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r.status_code == 200, r.text
+    out = r.json()
+    assert out["calibrado"] is True
+    assert out["escala_m_por_px"] == pytest.approx(10 / 100, rel=1e-3)
+
+
+def test_calibrar_distancia_menor_a_1m_falla(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    plano = _subir_plano(client, tecnico_token, pid)
+    r = client.patch(
+        f"/planos/{plano['id']}/calibracion",
+        json={"x1": 0, "y1": 0, "x2": 100, "y2": 0, "distancia_real_m": 0.5},
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r.status_code == 422
+
+
+def test_calibrar_puntos_iguales_falla(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    plano = _subir_plano(client, tecnico_token, pid)
+    r = client.patch(
+        f"/planos/{plano['id']}/calibracion",
+        json={"x1": 50, "y1": 50, "x2": 50, "y2": 50, "distancia_real_m": 5},
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r.status_code == 422
+
+
+def test_recalibrar_sin_puntos_permitido(client, tecnico_token):
+    """Sin puntos de medición (placeholder Sprint 2), recalibrar es válido."""
+    pid = _crear_proyecto(client, tecnico_token)
+    plano = _subir_plano(client, tecnico_token, pid)
+    body = {"x1": 0, "y1": 0, "x2": 100, "y2": 0, "distancia_real_m": 5}
+    r1 = client.patch(
+        f"/planos/{plano['id']}/calibracion",
+        json=body,
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r1.status_code == 200
+    r2 = client.patch(
+        f"/planos/{plano['id']}/calibracion",
+        json={**body, "distancia_real_m": 10},
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r2.status_code == 200
+    assert r2.json()["distancia_real_m"] == 10
+
+
+def test_eliminar_plano(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    plano = _subir_plano(client, tecnico_token, pid)
+    r = client.delete(
+        f"/planos/{plano['id']}",
+        headers={"Authorization": f"Bearer {tecnico_token}"},
+    )
+    assert r.status_code == 204
+
+
+# ---------- URLs firmadas ----------
+
+
+def test_url_firmada_valida_sirve_archivo(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    plano = _subir_plano(client, tecnico_token, pid)
+    url = plano["url_firmada"]
+    r = client.get(url)
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/")
+    assert len(r.content) > 0
+
+
+def test_url_firmada_expirada(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    plano = _subir_plano(client, tecnico_token, pid)
+    url = generar_url_firmada(
+        ruta_relativa=plano["url_firmada"].split("/planos/archivo/")[1].split("?")[0],
+        secret=settings.storage_url_secret,
+        base_url="",
+        ttl_seconds=-10,
+    )
+    r = client.get(url)
+    assert r.status_code == 403
+
+
+def test_url_firmada_manipulada(client, tecnico_token):
+    pid = _crear_proyecto(client, tecnico_token)
+    plano = _subir_plano(client, tecnico_token, pid)
+    url = plano["url_firmada"].replace("sig=", "sig=ffff")
+    r = client.get(url)
+    assert r.status_code == 403
+
+
+def test_verificar_firma_unit():
+    assert verificar_firma(
+        ruta_relativa="x.png",
+        secret="s",
+        exp=int(time.time()) + 60,
+        sig="bad",
+    ) is False

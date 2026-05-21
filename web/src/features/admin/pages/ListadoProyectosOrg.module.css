@@ -3,8 +3,6 @@
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 1.5rem;
-  gap: 1rem;
-  flex-wrap: wrap;
 }
 
 .titulo {
@@ -36,7 +34,6 @@
   background: var(--bg);
   color: var(--text-h);
   cursor: pointer;
-  max-width: 100%;
 }
 
 .select:focus {
@@ -54,7 +51,6 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .tabla {
@@ -125,52 +121,6 @@
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.botonAccion,
-.botonAccionPeligro,
-.botonAccionGhost {
-  min-width: unset;
-  width: auto;
-  flex: 0 0 auto;
-  min-height: 1.95rem;
-  line-height: 1;
-  border-radius: 0.78rem;
-  padding-inline: 0.72rem;
-}
-
-.botonAccion {
-  border-color: rgba(255, 255, 255, 0.08);
-  background: #1d202b;
-  color: #c6cada;
-}
-
-.botonAccion:hover:not(:disabled) {
-  background: #242734;
-}
-
-.botonAccionPeligro {
-  border: 1px solid rgba(255, 130, 130, 0.16);
-  background: #f9eded;
-  color: #df3b35;
-}
-
-.botonAccionPeligro:hover:not(:disabled) {
-  background: #f4e2e2;
-}
-
-.botonAccionGhost {
-  border: 1px solid rgba(77, 139, 255, 0.26);
-  color: #d7e6ff;
-  background: rgba(33, 77, 164, 0.3);
-}
-
-.botonAccionGhost:hover:not(:disabled) {
-  border-color: rgba(103, 160, 255, 0.42);
-  color: #eef4ff;
-  background: rgba(43, 94, 196, 0.42);
 }
 
 /* Modal de reasignación */
@@ -247,59 +197,13 @@
 
 /* Responsive */
 @media (max-width: 600px) {
-  .titulo {
-    font-size: 1.3rem;
-  }
-
-  .subtitulo {
-    font-size: 0.85rem;
-  }
-
-  .filtros {
-    align-items: stretch;
-  }
-
-  .select {
-    width: 100%;
-  }
-
-  .tabla {
-    min-width: 620px;
-    font-size: 0.85rem;
-  }
-
-  .tabla th,
-  .tabla td {
-    padding: 0.7rem 0.8rem;
-  }
-
   .tabla th:nth-child(5),
   .tabla td:nth-child(5),
   .tabla th:nth-child(6),
   .tabla td:nth-child(6) {
     display: none;
   }
-
-  .paginacion {
-    align-items: stretch;
-  }
-
-  .paginacion > * {
-    width: 100%;
-    text-align: center;
-  }
-
   .modalAcciones {
     flex-direction: column-reverse;
-  }
-
-  .modalAcciones > * {
-    width: 100%;
-  }
-}
-
-@media (max-width: 420px) {
-  .modal {
-    padding: 1.25rem;
   }
 }

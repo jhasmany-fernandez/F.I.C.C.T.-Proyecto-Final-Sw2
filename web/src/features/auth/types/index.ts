@@ -24,7 +24,6 @@ export interface LoginRequest {
 export interface AuthState {
   usuario: UsuarioOut | null;
   isAuthenticated: boolean;
-  isReady: boolean;
   isLoading: boolean;
   error: string | null;
 }

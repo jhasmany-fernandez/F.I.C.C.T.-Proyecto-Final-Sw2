@@ -17,9 +17,13 @@ class Settings(BaseSettings):
     debug: bool = False
     cors_origins: list[str] = ["http://localhost", "http://localhost:5173"]
 
-    # Storage local de planos
-    plano_storage_dir: str = "storage/planos"
-    plano_max_size_bytes: int = 10 * 1024 * 1024
+    # Storage de planos (Sprint 2)
+    storage_root: str = "/var/lib/heatmapper/planos"
+    storage_url_secret: str = "cambia_esto_secreto_para_firmar_urls"
+    storage_url_ttl_seconds: int = 3600  # 1 hora
+    # Prefijo opcional para URLs firmadas (e.g. "http://host/api"). Si vacío
+    # se devuelven URLs relativas que el cliente concatena con su base.
+    public_api_url: str = ""
 
 
 settings = Settings()

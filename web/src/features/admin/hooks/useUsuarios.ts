@@ -13,11 +13,6 @@ import type { UsuarioCreate, UsuarioUpdate } from "../types";
 
 const USUARIOS_KEY = ["admin", "usuarios"] as const;
 
-async function refrescarUsuarios(queryClient: ReturnType<typeof useQueryClient>) {
-  await queryClient.invalidateQueries({ queryKey: USUARIOS_KEY });
-  await queryClient.refetchQueries({ queryKey: USUARIOS_KEY, type: "active" });
-}
-
 export function useUsuarios(soloActivos = false) {
   return useQuery({
     queryKey: [...USUARIOS_KEY, { soloActivos }],
@@ -29,8 +24,8 @@ export function useCrearUsuario() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (datos: UsuarioCreate) => crearUsuario(datos),
-    onSuccess: async () => {
-      await refrescarUsuarios(queryClient);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USUARIOS_KEY });
     },
   });
 }
@@ -40,8 +35,8 @@ export function useActualizarUsuario() {
   return useMutation({
     mutationFn: ({ id, datos }: { id: number; datos: UsuarioUpdate }) =>
       actualizarUsuario(id, datos),
-    onSuccess: async () => {
-      await refrescarUsuarios(queryClient);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USUARIOS_KEY });
     },
   });
 }

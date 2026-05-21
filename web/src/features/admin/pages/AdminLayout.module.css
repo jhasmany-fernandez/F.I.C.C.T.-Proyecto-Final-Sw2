@@ -1,75 +1,76 @@
+/* =========================================================
+   AdminLayout — panel lateral + contenido
+   ========================================================= */
+
+/* Wrapper raíz */
 .layout {
   display: flex;
-  min-height: 100svh;
+  min-height: 100vh;
+  background: var(--bg-page);
   position: relative;
-  background: #101118;
 }
 
-.layout::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.02), transparent 35%);
-}
-
+/* ---- Trigger hamburguesa (solo móvil) ---- */
 .triggerMovil {
   display: none;
   position: fixed;
-  top: 0.8rem;
-  left: 0.8rem;
+  top: 1rem;
+  left: 1rem;
   z-index: 200;
-  width: 2.55rem;
-  height: 2.55rem;
-  border: 1px solid rgba(138, 156, 198, 0.18);
-  border-radius: 0.95rem;
-  background: #181a24;
-  color: #edf3ff;
+  background: var(--nav-bg);
+  color: var(--nav-text-active);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.5rem;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 16px 36px rgba(3, 7, 18, 0.32);
-  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-md);
 }
 
+/* ---- Overlay oscuro (móvil, detrás del drawer) ---- */
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(4, 8, 18, 0.62);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 100;
-  backdrop-filter: blur(3px);
 }
 
+/* ---- Wrapper del nav (sidebar desktop / drawer móvil) ---- */
 .navWrapper {
   position: relative;
   flex-shrink: 0;
-  width: 238px;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  background: #13151d;
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.015);
-  z-index: 1;
+  width: 240px;
 }
 
+/* ---- Botón cerrar drawer (solo visible en móvil) ---- */
 .cerrarDrawer {
   display: none;
   background: none;
   border: none;
-  color: rgba(223, 230, 248, 0.88);
+  color: var(--nav-text);
   cursor: pointer;
   padding: 0.375rem;
   position: absolute;
   top: 0.875rem;
   right: 0.875rem;
   z-index: 1;
-  border-radius: 0.8rem;
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast);
 }
 
+.cerrarDrawer:hover {
+  color: var(--nav-text-active);
+}
+
+/* ---- Navegación lateral ---- */
 .nav {
-  width: 238px;
+  width: 240px;
   height: 100vh;
+  background: var(--nav-bg);
   display: flex;
   flex-direction: column;
-  padding: 0.95rem 0.78rem 0.72rem;
+  padding: 1.5rem 1rem;
   position: sticky;
   top: 0;
   overflow-y: auto;
@@ -78,258 +79,166 @@
 .marca {
   display: flex;
   align-items: center;
-  gap: 0.58rem;
-  color: #f6f8ff;
+  gap: 0.5rem;
+  color: var(--nav-text-active);
   font-weight: 700;
-  font-size: 0.88rem;
-  padding: 0.35rem 0.28rem 0.95rem;
-  border-bottom: 1px solid rgba(121, 140, 182, 0.12);
+  font-size: 0.95rem;
+  padding: 0 0.5rem 1.5rem;
+  border-bottom: 1px solid var(--nav-border);
 }
 
 .menu {
   list-style: none;
   padding: 0;
-  margin: 0.95rem 0 0;
+  margin: 1.5rem 0 0;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.42rem;
+  gap: 0.25rem;
 }
 
 .enlace {
   display: flex;
   align-items: center;
-  gap: 0.58rem;
-  min-height: 2.7rem;
-  padding: 0.6rem 0.72rem;
-  border-radius: 0.78rem;
-  color: rgba(197, 206, 228, 0.74);
+  gap: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-md);
+  color: var(--nav-text);
   text-decoration: none;
-  font-size: 0.86rem;
-  border: 1px solid transparent;
+  font-size: 0.9rem;
   transition:
-    background 0.18s ease,
-    color 0.18s ease,
-    border-color 0.18s ease,
-    transform 0.18s ease;
+    background var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .enlace:hover {
-  color: #f4f7ff;
-  border-color: rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--nav-item-hover);
+  color: var(--nav-text-active);
 }
 
 .activo {
-  color: #fff;
-  border-color: rgba(82, 158, 228, 0.26);
-  background: #3483bb;
-  box-shadow: none;
+  background: var(--nav-item-active);
+  color: var(--nav-text-active);
 }
 
+/* ---- Perfil de usuario ---- */
 .perfil {
-  margin-top: 0.7rem;
-  padding-top: 0.7rem;
-  border-top: 1px solid rgba(121, 140, 182, 0.12);
-  display: grid;
+  padding-top: 1rem;
+  border-top: 1px solid var(--nav-border);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 0.5rem;
 }
 
-.identidad {
-  display: flex;
-  align-items: center;
-  gap: 0.58rem;
-  min-width: 0;
-}
-
 .avatar {
-  width: 2.15rem;
-  height: 2.15rem;
-  border-radius: 999px;
-  background: #3483bb;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary);
   color: #fff;
-  font-size: 0.76rem;
+  font-size: 0.8rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 14px 28px rgba(22, 55, 143, 0.34);
+  flex-shrink: 0;
 }
 
 .nombreUsuario {
-  color: #eef3ff;
-  font-size: 0.82rem;
-  font-weight: 600;
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  padding: 0 0.25rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
-  min-width: 0;
 }
 
-.contenido {
-  position: relative;
-  flex: 1;
-  padding: 1.05rem 1.02rem 1.12rem;
-  overflow-x: hidden;
-  min-width: 0;
-  width: 100%;
-}
-
-.topbar {
+.botonSalir {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.8rem;
-  min-height: 3.55rem;
-  margin-bottom: 0.8rem;
-  padding: 0.68rem 0.82rem;
-  border: 1px solid rgba(117, 132, 171, 0.18);
-  border-radius: 1rem;
-  background:
-    radial-gradient(circle at top right, rgba(72, 117, 212, 0.14), transparent 32%),
-    linear-gradient(180deg, rgba(23, 28, 41, 0.96) 0%, rgba(18, 22, 33, 0.96) 100%);
-  box-shadow: 0 16px 38px rgba(2, 6, 18, 0.24);
-  backdrop-filter: blur(12px);
-}
-
-.topbarSpacer {
-  flex: 1;
-}
-
-.topbarAcciones {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.58rem;
-  min-width: 0;
-  flex-wrap: wrap;
-}
-
-.botonNotificaciones,
-.botonSalirTopbar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  min-height: 2.1rem;
-  border-radius: 0.74rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 0.4rem;
+  background: none;
+  border: 1px solid var(--nav-border);
+  color: var(--nav-text);
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
   cursor: pointer;
   transition:
-    background 0.18s ease,
-    color 0.18s ease,
-    border-color 0.18s ease;
-}
-
-.botonNotificaciones {
-  width: 2.1rem;
-  padding: 0;
-  background: rgba(255, 255, 255, 0.03);
-  color: #d7e2fb;
-}
-
-.botonNotificaciones:hover {
-  background: rgba(63, 103, 186, 0.2);
-  border-color: rgba(91, 139, 241, 0.22);
-  color: #f3f7ff;
-}
-
-.topbarUsuario {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.52rem;
-  min-width: 0;
-  padding: 0.08rem 0.14rem 0.08rem 0.08rem;
-}
-
-.topbarNombre {
-  color: #eef3ff;
-  font-size: 0.84rem;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 16rem;
-}
-
-.botonSalirTopbar {
-  padding: 0.58rem 0.9rem;
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(214, 222, 241, 0.88);
-  font-size: 0.8rem;
-  width: 2.1rem;
-  padding: 0;
-}
-
-.botonSalirTopbar:hover {
-  background: rgba(114, 31, 44, 0.42);
-  color: #ffd6d9;
-  border-color: rgba(255, 108, 129, 0.22);
-}
-
-.contenidoInterno {
-  min-width: 0;
-}
-
-.estadoPantalla {
-  min-height: 100svh;
-  display: grid;
-  place-items: center;
+    background var(--transition-fast),
+    color var(--transition-fast);
   width: 100%;
+}
+
+.botonSalir:hover {
+  background: #e53e3e;
+  color: #fff;
+  border-color: #e53e3e;
+}
+
+/* ---- Contenido principal ---- */
+.contenido {
+  flex: 1;
   padding: 2rem;
-  color: rgba(204, 213, 236, 0.7);
-  background: #101118;
+  overflow-x: hidden;
+  min-width: 0;
 }
 
-@media (max-width: 1200px) {
-  .navWrapper,
-  .nav {
-    width: 224px;
-  }
-}
-
+/* =========================================================
+   Responsive — Tablet (≤1024px)
+   ========================================================= */
 @media (max-width: 1024px) {
+  .navWrapper {
+    width: 200px;
+  }
+
+  .nav {
+    width: 200px;
+    padding: 1.25rem 0.75rem;
+  }
+
   .contenido {
-    padding: 0.92rem 0.88rem 1rem;
-  }
-
-  .topbar {
-    padding: 0.64rem 0.76rem;
-  }
-
-  .topbarNombre {
-    max-width: 9rem;
+    padding: 1.5rem;
   }
 }
 
+/* =========================================================
+   Responsive — Móvil (≤768px) — Drawer
+   ========================================================= */
 @media (max-width: 768px) {
+  /* Mostrar trigger hamburguesa */
   .triggerMovil {
     display: flex;
   }
 
+  /* El overlay oscuro aparece cuando el menú está abierto (renderizado condicionalmente en JSX) */
+
+  /* Drawer: fuera de pantalla por defecto */
   .navWrapper {
     position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
-    width: min(84vw, 300px);
+    width: 260px;
     z-index: 150;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
     box-shadow: none;
   }
 
+  /* Drawer abierto */
   .navAbierto {
     transform: translateX(0);
-    box-shadow: 0 28px 60px rgba(2, 6, 19, 0.42);
+    box-shadow: var(--shadow-lg);
   }
 
   .nav {
-    width: min(84vw, 300px);
+    width: 260px;
     height: 100%;
     position: static;
-    padding-top: 3.6rem;
+    padding-top: 3.5rem; /* espacio para botón cerrar */
   }
 
   .cerrarDrawer {
@@ -337,24 +246,17 @@
   }
 
   .contenido {
-    padding: 0.88rem 0.8rem 1rem;
+    padding: 1rem;
+    padding-top: 4rem; /* espacio para hamburguesa fixed */
   }
+}
 
-  .topbar {
-    margin-top: 3.5rem;
-    align-items: stretch;
-  }
-
-  .topbarSpacer {
-    display: none;
-  }
-
-  .topbarAcciones {
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .topbarUsuario {
-    padding-inline: 0;
+/* =========================================================
+   Responsive — Pantallas muy pequeñas (≤480px)
+   ========================================================= */
+@media (max-width: 480px) {
+  .contenido {
+    padding: 0.875rem;
+    padding-top: 3.75rem;
   }
 }

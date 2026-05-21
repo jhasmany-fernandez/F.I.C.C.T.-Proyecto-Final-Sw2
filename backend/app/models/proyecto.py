@@ -52,19 +52,8 @@ class Proyecto(Base):
 
     tecnico = relationship("Usuario", back_populates="proyectos")
     cliente = relationship("Cliente", back_populates="proyectos")
-    plano = relationship(
+    planos = relationship(
         "Plano",
-        back_populates="proyecto",
-        uselist=False,
-        cascade="all, delete-orphan",
-    )
-    wifi_scans = relationship(
-        "WifiScanLote",
-        back_populates="proyecto",
-        cascade="all, delete-orphan",
-    )
-    puntos_medicion = relationship(
-        "PuntoMedicion",
         back_populates="proyecto",
         cascade="all, delete-orphan",
     )

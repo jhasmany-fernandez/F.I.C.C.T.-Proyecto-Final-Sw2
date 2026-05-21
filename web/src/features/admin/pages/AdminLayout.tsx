@@ -5,15 +5,8 @@
  */
 
 import { useEffect, useState } from "react";
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
-  NavLink,
-  Navigate,
-  Outlet,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
-import {
-  Bell,
   Radio,
   Users,
   Building2,
@@ -41,7 +34,7 @@ function iniciales(nombre: string): string {
 }
 
 export default function AdminLayout() {
-  const { isAuthenticated, isReady, usuario, cerrarSesion } = useAuth();
+  const { isAuthenticated, usuario, cerrarSesion, cargarSesion } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   // El drawer se abre "en" un pathname específico; si el pathname cambia, queda cerrado.
@@ -49,33 +42,26 @@ export default function AdminLayout() {
   const menuAbierto = menuAbiertoEn === location.pathname;
 
   useEffect(() => {
-    if (isReady && isAuthenticated && usuario?.rol !== "admin") {
-      void cerrarSesion().finally(() => {
-        navigate("/admin/login", { replace: true });
-      });
+    cargarSesion();
+  }, [cargarSesion]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      const timer = setTimeout(() => {
+        if (!useAuth.getState().isAuthenticated) {
+          navigate("/admin/login", { replace: true });
+        }
+      }, 50);
+      return () => clearTimeout(timer);
     }
-  }, [cerrarSesion, isAuthenticated, isReady, navigate, usuario]);
-
-  if (!isReady) {
-    return <main className={styles.estadoPantalla}>Cargando sesión…</main>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
-  }
-
-  if (usuario?.rol !== "admin") {
-    return (
-      <main className={styles.estadoPantalla}>
-        Verificando permisos del panel administrativo…
-      </main>
-    );
-  }
+  }, [isAuthenticated, navigate]);
 
   const handleLogout = async () => {
     await cerrarSesion();
     navigate("/admin/login", { replace: true });
   };
+
+  if (!isAuthenticated) return null;
 
   const sidebar = (
     <nav className={styles.nav} aria-label="Navegación principal">
@@ -101,14 +87,20 @@ export default function AdminLayout() {
       </ul>
 
       <div className={styles.perfil}>
-        <div className={styles.identidad}>
-          <div className={styles.avatar} aria-hidden="true">
-            {iniciales(usuario?.nombre ?? "A")}
-          </div>
-          <span className={styles.nombreUsuario}>
-            {usuario?.nombre ?? "Admin"}
-          </span>
+        <div className={styles.avatar} aria-hidden="true">
+          {iniciales(usuario?.nombre ?? "A")}
         </div>
+        <span className={styles.nombreUsuario}>
+          {usuario?.nombre ?? "Admin"}
+        </span>
+        <button
+          onClick={handleLogout}
+          className={styles.botonSalir}
+          aria-label="Cerrar sesión"
+        >
+          <LogOut size={14} aria-hidden="true" />
+          Cerrar sesión
+        </button>
       </div>
     </nav>
   );
@@ -149,42 +141,7 @@ export default function AdminLayout() {
       </div>
 
       <main className={styles.contenido}>
-        <header className={styles.topbar}>
-          <div className={styles.topbarSpacer} />
-
-          <div className={styles.topbarAcciones}>
-            <div className={styles.topbarUsuario}>
-              <div className={styles.avatar} aria-hidden="true">
-                {iniciales(usuario?.nombre ?? "A")}
-              </div>
-              <span className={styles.topbarNombre}>
-                {usuario?.nombre ?? "Admin"}
-              </span>
-            </div>
-
-            <button
-              type="button"
-              className={styles.botonNotificaciones}
-              aria-label="Notificaciones"
-              title="Notificaciones"
-            >
-              <Bell size={16} aria-hidden="true" />
-            </button>
-
-            <button
-              onClick={handleLogout}
-              className={styles.botonSalirTopbar}
-              aria-label="Cerrar sesión"
-              title="Cerrar sesión"
-            >
-              <LogOut size={14} aria-hidden="true" />
-            </button>
-          </div>
-        </header>
-
-        <div className={styles.contenidoInterno}>
-          <Outlet />
-        </div>
+        <Outlet />
       </main>
 
       <ToastContainer />

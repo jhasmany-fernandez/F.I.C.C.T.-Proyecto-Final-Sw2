@@ -3,5 +3,4 @@ from app.models.refresh_token import RefreshToken  # noqa: F401
 from app.models.cliente import Cliente  # noqa: F401
 from app.models.proyecto import Proyecto  # noqa: F401
 from app.models.plano import Plano  # noqa: F401
-from app.models.punto_medicion import PuntoMedicion  # noqa: F401
-from app.models.wifi_scan import WifiScanLote, WifiScanSenal  # noqa: F401
+from app.models.medicion import MedicionWifi, PuntoMedicion  # noqa: F401

@@ -82,7 +82,7 @@ class ProyectoRepository:
         """Retorna el proyecto si pertenece al técnico, o None si no existe/no es suyo."""
         return (
             self._db.query(Proyecto)
-            .options(joinedload(Proyecto.cliente), joinedload(Proyecto.plano))
+            .options(joinedload(Proyecto.cliente))
             .filter(Proyecto.id == proyecto_id, Proyecto.tecnico_id == tecnico_id)
             .first()
         )
@@ -129,27 +129,9 @@ class ProyectoRepository:
         """Retorna el proyecto por id sin restricción de técnico. Solo para uso admin. PB-18."""
         return (
             self._db.query(Proyecto)
-            .options(
-                joinedload(Proyecto.cliente),
-                joinedload(Proyecto.tecnico),
-                joinedload(Proyecto.plano),
-            )
+            .options(joinedload(Proyecto.cliente), joinedload(Proyecto.tecnico))
             .filter(Proyecto.id == proyecto_id)
             .first()
-        )
-
-    def obtener_por_id_visible(
-        self,
-        *,
-        proyecto_id: int,
-        current_user: Usuario,
-    ) -> Proyecto | None:
-        """Retorna un proyecto visible según el rol del usuario actual."""
-        if current_user.rol == "admin":
-            return self.obtener_por_id_admin(proyecto_id=proyecto_id)
-        return self.obtener_por_id(
-            proyecto_id=proyecto_id,
-            tecnico_id=current_user.id,
         )
 
     def archivar(self, *, proyecto: Proyecto) -> Proyecto:

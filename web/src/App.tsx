@@ -1,17 +1,24 @@
 import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import LoginAdmin from "@/features/auth/pages/LoginAdmin";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import AdminLayout from "@/features/admin/pages/AdminLayout";
 import GestionUsuarios from "@/features/admin/pages/GestionUsuarios";
 import GestionClientes from "@/features/admin/pages/GestionClientes";
 import ListadoProyectosOrg from "@/features/admin/pages/ListadoProyectosOrg";
-import CoverageAnalysisPage from "@/features/admin/pages/CoverageAnalysisPage";
-import { queryClient } from "@/shared/api/queryClient";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 30_000,
+    },
+  },
+});
 
 function AppRoutes() {
-  const cargarSesion = useAuth((s) => s.cargarSesion);
+  const { cargarSesion } = useAuth();
 
   useEffect(() => {
     cargarSesion();
@@ -31,10 +38,6 @@ function AppRoutes() {
         <Route path="usuarios" element={<GestionUsuarios />} />
         <Route path="clientes" element={<GestionClientes />} />
         <Route path="proyectos" element={<ListadoProyectosOrg />} />
-        <Route
-          path="proyectos/:proyectoId/diagnostico"
-          element={<CoverageAnalysisPage />}
-        />
       </Route>
 
       {/* Portal cliente — pendiente Sprint 6 (RP9) */}
